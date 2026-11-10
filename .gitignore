@@ -1,0 +1,32 @@
+## .NET / Visual Studio
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+*.userprefs
+*.rsuser
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ll]og/
+[Ll]ogs/
+*.log
+TestResults/
+.idea/
+.vscode/
+
+## NuGet
+*.nupkg
+**/[Pp]ackages/*
+
+## Gizli bilgiler
+.env
+*.pfx
+secrets.json
+appsettings.Production.json
+
+## Isletim sistemi
+Thumbs.db
+.DS_Store
