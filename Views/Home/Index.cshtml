@@ -1,0 +1,1104 @@
+@{
+    ViewData["Title"] = "İSTANBUL";
+}
+
+<style>
+    :root {
+        --bg-deep: rgba(10, 14, 22, 0.92);
+        --bg-card: rgba(18, 24, 36, 0.88);
+        --bg-input: rgba(12, 17, 26, 0.95);
+        --border-subtle: rgba(226, 230, 236, 0.16);
+        --border-strong: rgba(226, 230, 236, 0.42);
+        --text-bright: #e6e9ef;
+        --text-Mid: #aab3c2;
+        --text-dim: #6c7687;
+    }
+
+    /* Sinematik Başlık Tipografisi (Fotoğraftaki gibi geniş, ağır, büyük harf) */
+    .cinematic-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--text-bright);
+        line-height: 1.05;
+        margin: 0;
+    }
+
+    .cinematic-subtitle {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.24em;
+        font-size: 9.5px;
+        color: var(--text-dim);
+    }
+
+    /* Sol ve Sağ Paneller — Kırık beyaz ve gri tonlu keskin tasarım */
+    #search-panel, #save-panel {
+        position: absolute;
+        top: 68px;
+        z-index: 1000;
+        background-color: var(--bg-deep);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-subtle);
+        border-top: 2px solid var(--text-bright);
+        border-radius: 2px;
+        padding: 18px;
+        color: var(--text-bright);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+        max-height: calc(100vh - 130px);
+        overflow-y: auto;
+    }
+
+    #search-panel {
+        left: 20px;
+        width: 340px;
+    }
+
+    #save-panel {
+        right: 20px;
+        width: 310px;
+    }
+
+    /* Özel 스크롤바 */
+    #search-panel::-webkit-scrollbar,
+    #save-panel::-webkit-scrollbar,
+    #search-results::-webkit-scrollbar,
+    #waypoint-list::-webkit-scrollbar,
+    #saved-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    #search-panel::-webkit-scrollbar-thumb,
+    #save-panel::-webkit-scrollbar-thumb,
+    #search-results::-webkit-scrollbar-thumb,
+    #waypoint-list::-webkit-scrollbar-thumb,
+    #saved-list::-webkit-scrollbar-thumb {
+        background: rgba(226, 230, 236, 0.25);
+    }
+
+    /* Mod ve Kontrol Butonları */
+    .yw-btn {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 800;
+        font-size: 10.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        padding: 8px 12px;
+        background: transparent;
+        color: var(--text-Mid);
+        border: 1px solid var(--border-subtle);
+        border-radius: 1px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .yw-btn:hover:not(:disabled) {
+        color: #ffffff;
+        border-color: var(--border-strong);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .yw-btn.active, .yw-btn-primary {
+        background: var(--text-bright);
+        color: #090d14;
+        border-color: var(--text-bright);
+    }
+
+    .yw-btn-primary:hover:not(:disabled) {
+        background: #ffffff;
+        color: #000000;
+        border-color: #ffffff;
+    }
+
+    .yw-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+
+    .yw-btn-sm {
+        font-size: 9.5px;
+        padding: 5px 10px;
+        letter-spacing: 0.14em;
+    }
+
+    /* Input alanları */
+    .yw-input {
+        width: 100%;
+        background-color: var(--bg-input);
+        color: var(--text-bright);
+        border: 1px solid var(--border-subtle);
+        border-radius: 1px;
+        padding: 8px 11px;
+        font-size: 12.5px;
+        outline: none;
+        transition: border-color 0.15s ease;
+    }
+
+    .yw-input::placeholder {
+        color: var(--text-dim);
+    }
+
+    .yw-input:focus {
+        border-color: var(--text-bright);
+    }
+
+    /* Bölüm Ayırıcı Başlık */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-top: 16px;
+        margin-bottom: 8px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* Arama sonuçları açılır listesi */
+    #search-results {
+        list-style: none;
+        padding: 0;
+        margin: 6px 0 10px 0;
+        max-height: 210px;
+        overflow-y: auto;
+        background-color: #0d131d;
+        display: none;
+        border: 1px solid var(--border-strong);
+    }
+
+    #search-results li {
+        padding: 9px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        cursor: pointer;
+        font-size: 12px;
+        color: var(--text-Mid);
+        transition: all 0.12s;
+    }
+
+    #search-results li:hover {
+        background-color: var(--text-bright);
+        color: #090d14;
+        font-weight: 600;
+    }
+
+    /* Eklenen durakların listesi */
+    #waypoint-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        overflow-y: auto;
+        max-height: 190px;
+    }
+
+    .waypoint-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--bg-card);
+        padding: 7px 10px;
+        margin-bottom: 5px;
+        font-size: 12px;
+        border-left: 2px solid var(--text-bright);
+    }
+
+    .waypoint-item span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 240px;
+        color: var(--text-bright);
+    }
+
+    .btn-remove-stop {
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        font-size: 11px;
+        cursor: pointer;
+        padding: 0 4px;
+    }
+
+    .btn-remove-stop:hover {
+        color: #ffffff;
+    }
+
+    /* Kayıtlı rotalar listesi */
+    #saved-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    .saved-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--bg-card);
+        padding: 8px 10px;
+        margin-bottom: 6px;
+        font-size: 12px;
+        border-left: 2px solid var(--text-dim);
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .saved-item:hover, .saved-item.selected {
+        border-left-color: var(--text-bright);
+        background-color: rgba(230, 233, 239, 0.1);
+    }
+
+    .saved-item .saved-info {
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    .saved-item .saved-name {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 11.5px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--text-bright);
+    }
+
+    .saved-item .saved-meta {
+        font-size: 11px;
+        color: var(--text-dim);
+        margin-top: 2px;
+    }
+
+    /* Harita ve Sis (Fog) kapsayıcısı */
+    #map-container {
+        position: relative;
+        height: calc(100vh - 90px);
+        width: 100%;
+        overflow: hidden;
+        background-color: #090d14;
+    }
+
+    #map {
+        height: 100%;
+        width: 100%;
+        /* Harita karolarını hafif soğuk/desatüre sinematik tona çekiyoruz */
+        filter: saturate(0.55) contrast(1.05);
+    }
+
+    .fog-canvas {
+        pointer-events: none;
+        box-shadow: 0 0 0 5000px rgba(9, 13, 20, 0.90);
+    }
+
+    /* Alt durum çubuğu */
+    #info-panel {
+        height: 38px;
+        background-color: #090d14;
+        border-top: 1px solid var(--border-subtle);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 24px;
+    }
+
+    #status-text {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-Mid);
+    }
+</style>
+
+@* SOL ÜST: ROTA OLUŞTURUCU *@
+<div id="search-panel" translate="no">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <div class="cinematic-subtitle">KEŞİF SİSTEMİ</div>
+            <h2 class="cinematic-title" style="font-size: 18px;">ROTA PLANLA</h2>
+        </div>
+        <button id="btn-toggle-fog" class="yw-btn yw-btn-sm active" title="Sisi Aç/Kapat">
+            SİS: AÇIK
+        </button>
+    </div>
+
+    @* Ulaşım Modu Seçimi (Sadece Yürüyüş ve Araç) *@
+    <div class="d-flex gap-2 mb-3" id="mode-selector">
+        <button type="button" class="yw-btn active flex-fill mode-btn" data-mode="foot">YÜRÜYÜŞ</button>
+        <button type="button" class="yw-btn flex-fill mode-btn" data-mode="car">ARAÇ</button>
+    </div>
+
+    @* Arama Kutusu *@
+    <div class="d-flex gap-1">
+        <input type="text" id="place-input" class="yw-input" placeholder="Mekan veya semt ara (Kariye, Üsküdar...)" />
+        <button id="btn-search" class="yw-btn yw-btn-primary" type="button" style="white-space: nowrap;">ARA</button>
+    </div>
+
+    @* Arama Sonuçları *@
+    <ul id="search-results"></ul>
+
+    @* Eklenen Duraklar Listesi *@
+    <div class="section-header">
+        <span class="cinematic-subtitle" style="color: var(--text-Mid);">DURAKLAR</span>
+        <span id="point-count" class="cinematic-subtitle">0 NOKTA</span>
+    </div>
+    <ul id="waypoint-list">
+        <li id="empty-msg" style="color: var(--text-dim); font-size: 11.5px;">
+            Henüz durak seçilmedi.
+        </li>
+    </ul>
+
+    @* Mesafe ve Kontrol Butonları *@
+    <div class="mt-3 pt-3 d-flex justify-content-between align-items-center" style="border-top: 1px solid var(--border-subtle);">
+        <div>
+            <div class="cinematic-subtitle">MESAFE / SÜRE</div>
+            <div id="distance" class="cinematic-title" style="font-size: 14px; margin-top: 2px;">0.00 KM</div>
+        </div>
+        <div class="d-flex gap-1">
+            <button id="btn-undo" class="yw-btn yw-btn-sm" disabled>GERİ</button>
+            <button id="btn-clear" class="yw-btn yw-btn-sm" disabled>SIFIRLA</button>
+        </div>
+    </div>
+</div>
+
+@* SAĞ ÜST: ARŞİV VE KAYIT PANELİ *@
+<div id="save-panel" translate="no">
+    <div class="mb-2">
+        <div class="cinematic-subtitle">VERİTABANI</div>
+        <h2 class="cinematic-title" style="font-size: 16px;">ROTAYI KAYDET</h2>
+    </div>
+
+    <div class="mt-2">
+        <input type="text" id="route-name" class="yw-input mb-2" maxlength="200" placeholder="Rota başlığı girin..." />
+        <div class="d-flex gap-1">
+            <input type="date" id="route-date" class="yw-input" style="color-scheme: dark;" />
+            <button id="btn-save" class="yw-btn yw-btn-primary" type="button" disabled style="white-space: nowrap;">KAYDET</button>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <span class="cinematic-subtitle" style="color: var(--text-Mid);">KAYITLI ROTALAR</span>
+        <span id="saved-summary" class="cinematic-subtitle">...</span>
+    </div>
+    <ul id="saved-list"></ul>
+</div>
+
+@* Harita + Fog Canvas alanı *@
+<div id="map-container">
+    <div id="map"></div>
+</div>
+
+@* Alt durum çubuğu *@
+<div id="info-panel">
+    <span id="status-text">HARİTA SİSLE KAPLI — MEKAN ARATARAK ROTA OLUŞTURUN</span>
+    <span class="cinematic-subtitle">İSTANBUL // 41.0082° K, 28.9784° D</span>
+</div>
+
+@section Scripts {
+    <script>
+        // ============================================================
+        // 1) DEĞİŞKENLER VE İSTANBUL SINIRLARI
+        // ============================================================
+        var map;
+        var stops = [];             // Duraklar: { name, lat, lng, marker }
+        var routeLayer = null;      // Aktif rota çizgisi (Polyline)
+        var routeCoordinates = [];  // Sisi açmak için rotadaki tüm koordinat noktaları
+        var totalDistance = 0;
+        var totalDuration = 0;
+        var fogEnabled = true;
+
+        var TRAVEL_MODES = {
+            // Yürüyüş: Kesikli kırık beyaz çizgi
+            foot: { label: 'YÜRÜYÜŞ', server: 'routed-foot', dashArray: '2, 10', weight: 4 },
+            // Araç: Düz kırık beyaz çizgi
+            car:  { label: 'ARAÇ',    server: 'routed-car',  dashArray: null,    weight: 4 }
+        };
+
+        var travelMode = 'foot';
+        var routeRequestId = 0;
+        var savedRoutes = [];
+        var activeSavedRouteId = null;
+
+        // İSTANBUL COĞRAFİ SINIRLARI
+        var ISTANBUL_BOUNDS = L.latLngBounds(
+            [40.80, 28.40],
+            [41.35, 29.45]
+        );
+
+        // ============================================================
+        // 2) HARİTAYI OLUŞTUR (Sadece İstanbul Sınırları İçinde)
+        // ============================================================
+        map = L.map('map', {
+            zoomControl: false,
+            maxBounds: ISTANBUL_BOUNDS.pad(0.15),
+            minZoom: 10
+        }).setView([41.0150, 28.9550], 12);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap',
+            maxZoom: 19
+        }).addTo(map);
+
+        // ============================================================
+        // 3) FOG OF WAR (SİS EFEKTİ) MOTORU
+        // ============================================================
+        map.createPane('fogPane');
+        map.getPane('fogPane').style.zIndex = 350;
+        map.getPane('fogPane').style.pointerEvents = 'none';
+
+        var FogLayer = L.Layer.extend({
+            options: { padding: 0.5 },
+
+            onAdd: function (map) {
+                this._canvas = L.DomUtil.create('canvas', 'fog-canvas leaflet-zoom-animated');
+                this._ctx = this._canvas.getContext('2d');
+                map.getPane('fogPane').appendChild(this._canvas);
+                this._reset();
+            },
+
+            onRemove: function () {
+                L.DomUtil.remove(this._canvas);
+            },
+
+            getEvents: function () {
+                return {
+                    zoomanim: this._onZoomAnim,
+                    zoom: this._onZoom,
+                    moveend: this._reset,
+                    viewreset: this._reset,
+                    resize: this._reset
+                };
+            },
+
+            _onZoomAnim: function (e) {
+                this._updateTransform(e.center, e.zoom);
+            },
+
+            _onZoom: function () {
+                this._updateTransform(this._map.getCenter(), this._map.getZoom());
+            },
+
+            _updateTransform: function (center, zoom) {
+                var map = this._map;
+                var scale = map.getZoomScale(zoom, this._zoom);
+                var viewHalf = map.getSize().multiplyBy(0.5 + this.options.padding);
+                var currentCenterPoint = map.project(this._center, zoom);
+                var topLeftOffset = viewHalf.multiplyBy(-scale)
+                    .add(currentCenterPoint)
+                    .subtract(map._getNewPixelOrigin(center, zoom));
+
+                L.DomUtil.setTransform(this._canvas, topLeftOffset, scale);
+            },
+
+            _reset: function () {
+                var map = this._map;
+                var p = this.options.padding;
+                var size = map.getSize();
+
+                this._min = map.containerPointToLayerPoint(size.multiplyBy(-p)).round();
+                this._center = map.getCenter();
+                this._zoom = map.getZoom();
+
+                var canvasSize = size.multiplyBy(1 + p * 2).round();
+                this._canvas.width = canvasSize.x;
+                this._canvas.height = canvasSize.y;
+                this._canvas.style.width = canvasSize.x + 'px';
+                this._canvas.style.height = canvasSize.y + 'px';
+
+                this._updateTransform(this._center, this._zoom);
+                this.redraw();
+            },
+
+            _getClearRadius: function () {
+                return Math.max(16, Math.pow(1.45, this._zoom - 11) * 14);
+            },
+
+            redraw: function () {
+                if (!this._canvas) return;
+
+                var ctx = this._ctx;
+                var canvas = this._canvas;
+                var map = this._map;
+                var min = this._min;
+
+                canvas.style.display = fogEnabled ? '' : 'none';
+
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (!fogEnabled) return;
+
+                // Derin antrasit/gece sisi
+                ctx.fillStyle = 'rgba(9, 13, 20, 0.90)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.translate(-min.x, -min.y);
+
+                var radius = this._getClearRadius();
+
+                var allPaths = savedRoutes.map(function (r) { return r.geometry; });
+                if (routeCoordinates.length >= 2) allPaths.push(routeCoordinates);
+
+                var allStops = stops.slice();
+                savedRoutes.forEach(function (r) { allStops = allStops.concat(r.stops); });
+
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                var passes = [
+                    { widthMultiplier: 2.4, alpha: 0.25 },
+                    { widthMultiplier: 1.7, alpha: 0.55 },
+                    { widthMultiplier: 1.0, alpha: 1.0 }
+                ];
+
+                allPaths.forEach(function (path) {
+                    if (!path || path.length < 2) return;
+                    var pts = path.map(function (coord) { return map.latLngToLayerPoint(coord); });
+
+                    passes.forEach(function (pass) {
+                        ctx.beginPath();
+                        ctx.lineWidth = radius * pass.widthMultiplier;
+                        ctx.strokeStyle = 'rgba(0, 0, 0, ' + pass.alpha + ')';
+                        pts.forEach(function (pt, idx) {
+                            if (idx === 0) ctx.moveTo(pt.x, pt.y);
+                            else ctx.lineTo(pt.x, pt.y);
+                        });
+                        ctx.stroke();
+                    });
+                });
+
+                allStops.forEach(function (stop) {
+                    var pt = map.latLngToLayerPoint([stop.lat, stop.lng]);
+                    var stopRadius = radius * 1.8;
+
+                    var grad = ctx.createRadialGradient(pt.x, pt.y, stopRadius * 0.2, pt.x, pt.y, stopRadius);
+                    grad.addColorStop(0, 'rgba(0, 0, 0, 1)');
+                    grad.addColorStop(0.6, 'rgba(0, 0, 0, 0.8)');
+                    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, stopRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.globalCompositeOperation = 'source-over';
+            }
+        });
+
+        var fogLayer = new FogLayer().addTo(map);
+
+        function drawFog() {
+            fogLayer.redraw();
+        }
+
+        document.getElementById('btn-toggle-fog').addEventListener('click', function () {
+            fogEnabled = !fogEnabled;
+            this.textContent = fogEnabled ? 'SİS: AÇIK' : 'SİS: KAPALI';
+            this.className = fogEnabled ? 'yw-btn yw-btn-sm active' : 'yw-btn yw-btn-sm';
+            drawFog();
+        });
+
+        // ============================================================
+        // 4) AKILLI & ESNEK İSTANBUL İÇİ MEKAN ARAMA (Canlı Autocomplete)
+        // ============================================================
+        var placeInput = document.getElementById('place-input');
+        var btnSearch = document.getElementById('btn-search');
+        var searchResults = document.getElementById('search-results');
+        var searchTimer = null;
+
+        function toTurkishTitleCase(str) {
+            return str.split(/\s+/).map(function (w) {
+                if (!w) return '';
+                return w.charAt(0).toLocaleUpperCase('tr-TR') + w.slice(1).toLocaleLowerCase('tr-TR');
+            }).join(' ');
+        }
+
+        placeInput.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            var val = placeInput.value.trim();
+            if (val.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            searchTimer = setTimeout(searchPlace, 280);
+        });
+
+        placeInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                clearTimeout(searchTimer);
+                searchPlace();
+            }
+        });
+
+        btnSearch.addEventListener('click', function () {
+            clearTimeout(searchTimer);
+            searchPlace();
+        });
+
+        async function searchPlace() {
+            var rawQuery = placeInput.value.trim();
+            if (!rawQuery) return;
+
+            var formattedQuery = toTurkishTitleCase(rawQuery);
+            document.getElementById('status-text').textContent = "'" + rawQuery.toLocaleUpperCase('tr-TR') + "' ARANIYOR...";
+            searchResults.innerHTML = '';
+
+            var results = [];
+            var seenKeys = {};
+
+            function addCandidate(name, lat, lng) {
+                if (!ISTANBUL_BOUNDS.contains([lat, lng])) return;
+                var key = lat.toFixed(3) + '_' + lng.toFixed(3);
+                if (seenKeys[key]) return;
+                seenKeys[key] = true;
+                results.push({ name: name, lat: lat, lng: lng });
+            }
+
+            try {
+                var photonUrl = 'https://photon.komoot.io/api/?q=' + encodeURIComponent(formattedQuery) +
+                                '&lat=41.015&lon=28.955&bbox=28.40,40.80,29.45,41.35&limit=8';
+
+                var nomUrl = 'https://nominatim.openstreetmap.org/search?format=json' +
+                             '&q=' + encodeURIComponent(formattedQuery) +
+                             '&countrycodes=tr&viewbox=28.40,41.35,29.45,40.80&bounded=1&limit=6';
+
+                var responses = await Promise.allSettled([
+                    fetch(photonUrl).then(function (r) { return r.json(); }),
+                    fetch(nomUrl).then(function (r) { return r.json(); })
+                ]);
+
+                if (responses[0].status === 'fulfilled' && responses[0].value && responses[0].value.features) {
+                    responses[0].value.features.forEach(function (f) {
+                        var coords = f.geometry.coordinates;
+                        var p = f.properties;
+                        var parts = [p.name, p.street, p.district, p.city || p.state].filter(Boolean);
+                        if (parts.length > 0) {
+                            addCandidate(parts.slice(0, 3).join(', '), coords[1], coords[0]);
+                        }
+                    });
+                }
+
+                if (responses[1].status === 'fulfilled' && Array.isArray(responses[1].value)) {
+                    responses[1].value.forEach(function (item) {
+                        var shortName = item.display_name.split(',').slice(0, 3).join(',');
+                        addCandidate(shortName, parseFloat(item.lat), parseFloat(item.lon));
+                    });
+                }
+
+                if (results.length === 0) {
+                    searchResults.style.display = 'none';
+                    document.getElementById('status-text').textContent = "SONUÇ BULUNAMADI — FARKLI BİR İSİM DENEYİN";
+                    return;
+                }
+
+                searchResults.style.display = 'block';
+                results.slice(0, 7).forEach(function (item) {
+                    var li = document.createElement('li');
+                    li.textContent = item.name;
+
+                    li.addEventListener('click', function () {
+                        addWaypoint(item.name, item.lat, item.lng);
+                        searchResults.style.display = 'none';
+                        placeInput.value = '';
+                        placeInput.focus();
+                    });
+
+                    searchResults.appendChild(li);
+                });
+
+                document.getElementById('status-text').textContent = "LİSTEDEN DURAK SEÇİN";
+            } catch (err) {
+                console.error(err);
+                document.getElementById('status-text').textContent = "ARAMA BAĞLANTI HATASI";
+            }
+        }
+
+        // ============================================================
+        // 5) DURAK (WAYPOINT) EKLEME FONKSİYONU
+        // ============================================================
+        function createMonochromeMarkerIcon(num) {
+            return L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background-color: #e6e9ef; color: #090d14; font-family: \'Montserrat\', sans-serif; font-weight: 900; font-size: 11px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #090d14; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.8);">' + num + '</div>',
+                iconSize: [22, 22],
+                iconAnchor: [11, 11]
+            });
+        }
+
+        function addWaypoint(name, lat, lng) {
+            var stopNumber = stops.length + 1;
+            var marker = L.marker([lat, lng], { icon: createMonochromeMarkerIcon(stopNumber) }).addTo(map);
+            marker.bindPopup("<b>" + stopNumber + ". " + name + "</b>");
+
+            stops.push({ name: name, lat: lat, lng: lng, marker: marker });
+
+            map.panTo([lat, lng]);
+            updateUI();
+            drawFog();
+
+            if (stops.length >= 2) {
+                drawRoute();
+            } else {
+                document.getElementById('status-text').textContent = "BAŞLANGIÇ NOKTASI EKLENDİ — HEDEF NOKTAYI SEÇİN";
+            }
+        }
+
+        // ============================================================
+        // 6) ROTA HESAPLAMA (YÜRÜYÜŞ VE ARAÇ)
+        // ============================================================
+        function drawRoute() {
+            var mode = TRAVEL_MODES[travelMode] || TRAVEL_MODES.foot;
+            var requestId = ++routeRequestId;
+
+            if (stops.length < 2) return;
+
+            var coordsString = stops.map(function (s) {
+                return s.lng + ',' + s.lat;
+            }).join(';');
+
+            var url = 'https://routing.openstreetmap.de/' + mode.server + '/route/v1/driving/' + coordsString + '?overview=full&geometries=geojson';
+
+            document.getElementById('status-text').textContent = mode.label + " ROTASI HESAPLANIYOR...";
+
+            fetch(url)
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (requestId !== routeRequestId) return;
+
+                    if (!data.routes || data.routes.length === 0) {
+                        document.getElementById('status-text').textContent = "BU NOKTALAR ARASI ROTA BULUNAMADI";
+                        return;
+                    }
+
+                    var route = data.routes[0];
+                    totalDistance = route.distance;
+                    totalDuration = route.duration;
+
+                    var latLngs = route.geometry.coordinates.map(function (coord) {
+                        return [coord[1], coord[0]];
+                    });
+
+                    routeCoordinates = latLngs;
+
+                    if (routeLayer) {
+                        map.removeLayer(routeLayer);
+                        routeLayer = null;
+                    }
+
+                    // Kırık beyaz (#e6e9ef) çizgi: Yürüyüş kesikli, Araç düz
+                    routeLayer = L.polyline(latLngs, {
+                        color: '#e6e9ef',
+                        weight: mode.weight,
+                        opacity: 0.95,
+                        lineJoin: 'round',
+                        lineCap: 'round',
+                        dashArray: mode.dashArray
+                    }).addTo(map);
+
+                    drawFog();
+                    updateUI();
+                    document.getElementById('status-text').textContent = mode.label + " ROTASI OLUŞTURULDU — SİS AÇILDI";
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    document.getElementById('status-text').textContent = "ROTA HESAPLAMA HATASI";
+                });
+        }
+
+        // ============================================================
+        // 7) SOL PANELİ VE LİSTEYİ GÜNCELLEME
+        // ============================================================
+        function updateUI() {
+            var listEl = document.getElementById('waypoint-list');
+            listEl.innerHTML = '';
+
+            if (stops.length === 0) {
+                listEl.innerHTML = '<li id="empty-msg" style="color: var(--text-dim); font-size: 11.5px;">Henüz durak seçilmedi.</li>';
+            } else {
+                stops.forEach(function (stop, index) {
+                    var li = document.createElement('li');
+                    li.className = 'waypoint-item';
+                    li.innerHTML = '<span title="' + stop.name + '"><strong>' + (index + 1) + '.</strong> ' + stop.name + '</span>' +
+                                   '<button class="btn-remove-stop" onclick="removeStop(' + index + ')" title="Sil">✕</button>';
+                    listEl.appendChild(li);
+                });
+            }
+
+            document.getElementById('point-count').textContent = stops.length + " NOKTA";
+            var km = (totalDistance / 1000).toFixed(2);
+            var durationText = '';
+            if (totalDistance > 0) {
+                var minutes = Math.round(totalDuration / 60);
+                durationText = minutes >= 60
+                    ? '  //  ' + Math.floor(minutes / 60) + ' SA ' + (minutes % 60) + ' DK'
+                    : '  //  ' + minutes + ' DK';
+            }
+            document.getElementById('distance').textContent = km + " KM" + durationText;
+
+            document.getElementById('btn-undo').disabled = (stops.length === 0);
+            document.getElementById('btn-clear').disabled = (stops.length === 0);
+            document.getElementById('btn-save').disabled = !(stops.length >= 2 && routeCoordinates.length >= 2);
+        }
+
+        window.removeStop = function (index) {
+            map.removeLayer(stops[index].marker);
+            stops.splice(index, 1);
+
+            stops.forEach(function (s, idx) {
+                var num = idx + 1;
+                s.marker.setIcon(createMonochromeMarkerIcon(num));
+                s.marker.bindPopup("<b>" + num + ". " + s.name + "</b>");
+            });
+
+            if (stops.length >= 2) {
+                drawRoute();
+            } else {
+                if (routeLayer) {
+                    map.removeLayer(routeLayer);
+                    routeLayer = null;
+                }
+                routeCoordinates = [];
+                totalDistance = 0;
+                totalDuration = 0;
+                routeRequestId++;
+                drawFog();
+            }
+            updateUI();
+        };
+
+        // ============================================================
+        // 8) GERİ AL VE SIFIRLA BUTONLARI
+        // ============================================================
+        document.getElementById('btn-undo').addEventListener('click', function () {
+            if (stops.length > 0) {
+                window.removeStop(stops.length - 1);
+                document.getElementById('status-text').textContent = "SON DURAK SİLİNDİ";
+            }
+        });
+
+        function clearDraft() {
+            stops.forEach(function (s) { map.removeLayer(s.marker); });
+            stops = [];
+            if (routeLayer) {
+                map.removeLayer(routeLayer);
+                routeLayer = null;
+            }
+            routeCoordinates = [];
+            totalDistance = 0;
+            totalDuration = 0;
+            routeRequestId++;
+            drawFog();
+            updateUI();
+        }
+
+        document.getElementById('btn-clear').addEventListener('click', function () {
+            clearDraft();
+            document.getElementById('status-text').textContent = "TASLAK ROTA SIFIRLANDI";
+        });
+
+        // ============================================================
+        // 9) ULAŞIM MODU SEÇİMİ (YÜRÜYÜŞ / ARAÇ)
+        // ============================================================
+        document.querySelectorAll('.mode-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var selected = this.getAttribute('data-mode');
+                if (selected === travelMode) return;
+                travelMode = selected;
+
+                document.querySelectorAll('.mode-btn').forEach(function (b) {
+                    var isActive = b.getAttribute('data-mode') === travelMode;
+                    b.className = 'yw-btn flex-fill mode-btn' + (isActive ? ' active' : '');
+                });
+
+                if (stops.length >= 2) {
+                    drawRoute();
+                } else {
+                    document.getElementById('status-text').textContent = TRAVEL_MODES[travelMode].label + " MODU AKTİF";
+                }
+            });
+        });
+
+        // ============================================================
+        // 10) VERİTABANI İŞLEMLERİ (SQL Server ← API ← JavaScript)
+        // ============================================================
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function todayString() {
+            var d = new Date();
+            var mm = String(d.getMonth() + 1).padStart(2, '0');
+            var dd = String(d.getDate()).padStart(2, '0');
+            return d.getFullYear() + '-' + mm + '-' + dd;
+        }
+        document.getElementById('route-date').value = todayString();
+
+        function getModeLabel(mode) {
+            return (mode === 'car') ? 'ARAÇ' : 'YÜRÜYÜŞ';
+        }
+
+        function addSavedRouteToMap(route) {
+            var isDashed = (route.travelMode !== 'car');
+            route.layer = L.polyline(route.geometry, {
+                color: '#aeb7c6',
+                weight: 3,
+                opacity: 0.65,
+                lineJoin: 'round',
+                lineCap: 'round',
+                dashArray: isDashed ? '2, 10' : null
+            }).addTo(map);
+
+            route.layer.bindPopup(
+                '<b>' + escapeHtml(route.name) + '</b><br>' +
+                new Date(route.walkDate).toLocaleDateString('tr-TR') + ' — ' +
+                getModeLabel(route.travelMode) + ' (' + (route.distanceMeters / 1000).toFixed(2) + ' KM)'
+            );
+        }
+
+        function renderSavedList() {
+            var listEl = document.getElementById('saved-list');
+            listEl.innerHTML = '';
+
+            var totalKm = savedRoutes.reduce(function (sum, r) { return sum + r.distanceMeters; }, 0) / 1000;
+            document.getElementById('saved-summary').textContent =
+                savedRoutes.length + ' ROTA // ' + totalKm.toFixed(1) + ' KM';
+
+            if (savedRoutes.length === 0) {
+                listEl.innerHTML = '<li style="color: var(--text-dim); font-size: 11.5px;">Kayıtlı rota bulunmuyor.</li>';
+                return;
+            }
+
+            savedRoutes.forEach(function (route) {
+                var li = document.createElement('li');
+                li.className = 'saved-item' + (activeSavedRouteId === route.id ? ' selected' : '');
+                li.innerHTML =
+                    '<div class="saved-info">' +
+                        '<div class="saved-name">' + escapeHtml(route.name) + '</div>' +
+                        '<div class="saved-meta">' + new Date(route.walkDate).toLocaleDateString('tr-TR') +
+                        '  •  ' + (route.distanceMeters / 1000).toFixed(2) + ' KM  •  ' + getModeLabel(route.travelMode) + '</div>' +
+                    '</div>' +
+                    '<button class="btn-remove-stop ms-2" title="Sil">✕</button>';
+
+                li.addEventListener('click', function () {
+                    activeSavedRouteId = route.id;
+                    renderSavedList();
+                    // Seçilen rotayı daha parlak kırık beyaz vurgula, diğerlerini gri tut
+                    savedRoutes.forEach(function (r) {
+                        if (!r.layer) return;
+                        if (r.id === route.id) {
+                            r.layer.setStyle({ color: '#ffffff', weight: 4, opacity: 0.95 });
+                        } else {
+                            r.layer.setStyle({ color: '#aeb7c6', weight: 3, opacity: 0.65 });
+                        }
+                    });
+                    map.fitBounds(route.layer.getBounds(), { padding: [50, 50] });
+                    route.layer.openPopup();
+                });
+
+                li.querySelector('button').addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    deleteRoute(route);
+                });
+
+                listEl.appendChild(li);
+            });
+        }
+
+        function loadSavedRoutes() {
+            fetch('/api/routes')
+                .then(function (response) {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                })
+                .then(function (data) {
+                    savedRoutes.forEach(function (r) { if (r.layer) map.removeLayer(r.layer); });
+                    savedRoutes = data;
+                    savedRoutes.forEach(addSavedRouteToMap);
+                    renderSavedList();
+                    drawFog();
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    document.getElementById('saved-summary').textContent = 'BAĞLANTI HATASI';
+                });
+        }
+
+        document.getElementById('btn-save').addEventListener('click', function () {
+            var nameInput = document.getElementById('route-name');
+            var name = nameInput.value.trim();
+            if (!name) {
+                nameInput.focus();
+                document.getElementById('status-text').textContent = "LÜTFEN ROTA BAŞLIĞI GİRİN";
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+
+            var payload = {
+                name: name,
+                walkDate: document.getElementById('route-date').value || todayString(),
+                travelMode: travelMode,
+                distanceMeters: totalDistance,
+                durationSeconds: totalDuration,
+                geometry: routeCoordinates,
+                stops: stops.map(function (s) { return { name: s.name, lat: s.lat, lng: s.lng }; })
+            };
+
+            fetch('/api/routes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        return response.text().then(function (t) { throw new Error(t || ('HTTP ' + response.status)); });
+                    }
+                    return response.json();
+                })
+                .then(function (saved) {
+                    addSavedRouteToMap(saved);
+                    savedRoutes.unshift(saved);
+                    clearDraft();
+                    renderSavedList();
+                    nameInput.value = '';
+                    document.getElementById('status-text').textContent = "'" + saved.name.toLocaleUpperCase('tr-TR') + "' VERİTABANINA KAYDEDİLDİ";
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    updateUI();
+                    document.getElementById('status-text').textContent = "KAYIT HATASI: " + err.message;
+                });
+        });
+
+        function deleteRoute(route) {
+            if (!confirm("'" + route.name + "' kaydı silinsin mi?")) return;
+
+            fetch('/api/routes/' + route.id, { method: 'DELETE' })
+                .then(function (response) {
+                    if (!response.ok && response.status !== 404) throw new Error('HTTP ' + response.status);
+                    if (route.layer) map.removeLayer(route.layer);
+                    savedRoutes = savedRoutes.filter(function (r) { return r.id !== route.id; });
+                    renderSavedList();
+                    drawFog();
+                    document.getElementById('status-text').textContent = "ROTA SİLİNDİ";
+                })
+                .catch(function (err) {
+                    console.error(err);
+                });
+        }
+
+        loadSavedRoutes();
+    </script>
+}

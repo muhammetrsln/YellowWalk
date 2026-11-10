@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — YELLOWWALK</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/YellowWalk.styles.css" asp-append-version="true" />
+
+    @* Sinematik ve keskin tipografi için Google Fonts (Montserrat 900/800/700 + Inter) *@
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+
+    @* HARİTA İÇİN GEREKLİ OLAN LEAFLET CSS DOSYASI *@
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #090d14;
+            color: #e6e9ef;
+            user-select: none;
+        }
+        .yw-header {
+            background-color: #090d14;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+            height: 52px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            justify-content: space-between;
+        }
+        .yw-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 18px;
+            letter-spacing: 0.22em;
+            color: #e6e9ef;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+        .yw-brand:hover {
+            color: #ffffff;
+        }
+        .yw-tagline {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 10px;
+            letter-spacing: 0.28em;
+            color: rgba(230, 233, 239, 0.55);
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden">
+    <header class="yw-header">
+        <a class="yw-brand" asp-area="" asp-controller="Home" asp-action="Index">YELLOWWALK</a>
+        <span class="yw-tagline">İSTANBUL KEŞİF ARŞİVİ</span>
+    </header>
+
+    @* Sayfa içeriğinin tam ekran yayılması için container sınıflarını kaldırdık *@
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @* HARİTA İÇİN GEREKLİ OLAN LEAFLET JS DOSYASI *@
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
