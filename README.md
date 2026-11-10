@@ -38,11 +38,12 @@ cd YellowWalk
    dotnet tool install --global dotnet-ef
    dotnet ef database update
    ```
-3. Uygulamayı çalıştır:
+3. (Opsiyonel) Örnek bir rota eklemek için [`Database/seed.sql`](Database/seed.sql) dosyasını SSMS'te çalıştır. Uygulama veritabanı boş başlar.
+4. Uygulamayı çalıştır:
    ```bash
    dotnet run
    ```
-4. Terminalde yazan adresi tarayıcıda aç.
+5. Terminalde yazan adresi tarayıcıda aç.
 
 ## API
 
