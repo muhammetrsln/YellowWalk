@@ -2,6 +2,16 @@
 
 İstanbul için etkileşimli bir şehir keşfi ve rota planlama web uygulaması. Haritada gerçek zamanlı **"Fog of War" (savaş sisi)** mekaniği vardır: şehri gezdikçe sis dağılır, yürüyüş veya sürüş rotaları planlayabilir ve yolculuklarını arşivleyebilirsin.
 
+## Ekran Görüntüleri
+
+**Rota planlama:** Duraklar eklenir, rota çizilir ve sis dağılır.
+
+![Rota planlama](docs/screenshots/rota-planlama.jpg)
+
+**Rota kaydedildi:** Rota veritabanına kaydedilir ve sağdaki listede görünür.
+
+![Rota kaydedildi](docs/screenshots/rota-kaydedildi.jpg)
+
 ## Özellikler
 
 - 🌫️ Fog of War haritası: Gezdiğin bölgelerin üzerindeki sis açılır
